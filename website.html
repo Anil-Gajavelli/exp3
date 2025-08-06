@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Attractive E-commerce Demo</title>
+  <style>
+    /* Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: #f5f7fa;
+      color: #333;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: #4a90e2;
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: white;
+      box-shadow: 0 4px 6px rgba(74,144,226,0.4);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    header .logo {
+      font-weight: 700;
+      font-size: 1.8rem;
+      letter-spacing: 2px;
+      cursor: default;
+      user-select: none;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+
+    header .cart button {
+      background: #f9a825;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-weight: 600;
+      cursor: pointer;
+      color: #333;
+      box-shadow: 0 4px 12px rgba(249,168,37,0.5);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1rem;
+    }
+
+    header .cart button:hover {
+      background: #ffc107;
+      box-shadow: 0 6px 20px rgba(255,193,7,0.7);
+      transform: scale(1.05);
+    }
+
+    .products {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 30px;
+      padding: 40px;
+      max-width: 1200px;
+      margin: 0 auto;
+      flex-grow: 1;
+    }
+
+    .product {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.07);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+    }
+    .product:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+    }
+
+    .product img {
+      width: 100%;
+      object-fit: cover;
+      height: 160px;
+      transition: transform 0.3s ease;
+    }
+    .product:hover img {
+      transform: scale(1.05);
+    }
+
+    .product-details {
+      padding: 20px 18px 30px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .product-details h2 {
+      font-weight: 700;
+      font-size: 1.25rem;
+      margin-bottom: 8px;
+      color: #222;
+      user-select: none;
+    }
+
+    .product-details p {
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #4a90e2;
+      margin-bottom: 20px;
+      user-select: none;
+    }
+
+    .product-details button {
+      background: #4a90e2;
+      border: none;
+      padding: 12px 0;
+      border-radius: 30px;
+      font-weight: 600;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(74,144,226,0.45);
+      transition: background 0.3s ease, box-shadow 0.3s ease;
+      user-select: none;
+    }
+    .product-details button:hover {
+      background: #357ABD;
+      box-shadow: 0 10px 28px rgba(53,122,189,0.65);
+      transform: translateY(-2px);
+    }
+
+    /* Cart Modal */
+    .cart-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.45);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+      animation: fadeIn 0.3s ease forwards;
+    }
+
+    .cart-content {
+      background: white;
+      border-radius: 15px;
+      padding: 30px 35px;
+      width: 360px;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 14px 48px rgba(0,0,0,0.15);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+
+    .cart-content h2 {
+      font-size: 2rem;
+      margin-bottom: 20px;
+      font-weight: 700;
+      color: #4a90e2;
+      user-select: none;
+    }
+
+    #cart-items {
+      list-style: none;
+      width: 100%;
+      margin-bottom: 25px;
+    }
+
+    #cart-items li {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+      font-weight: 600;
+      color: #444;
+      align-items: center;
+      user-select: none;
+    }
+
+    #cart-items li:last-child {
+      border-bottom: none;
+    }
+
+    #cart-items li button {
+      background: #e63946;
+      border: none;
+      border-radius: 20px;
+      padding: 4px 12px;
+      color: white;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.85rem;
+      transition: background 0.3s ease;
+      user-select: none;
+    }
+
+    #cart-items li button:hover {
+      background: #c5303e;
+    }
+
+    #total-price {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #222;
+      margin-bottom: 30px;
+      user-select: none;
+    }
+
+    #close-cart {
+      background: #4a90e2;
+      border: none;
+      color: white;
+      font-weight: 700;
+      font-size: 1.1rem;
+      padding: 14px 0;
+      width: 100%;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 8px 25px rgba(74,144,226,0.6);
+      transition: background 0.3s ease;
+      user-select: none;
+    }
+
+    #close-cart:hover {
+      background: #357ABD;
+      transform: translateY(-2px);
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 400px) {
+      .cart-content {
+        width: 90%;
+        padding: 25px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">E-Shop</div>
+    <div class="cart">
+      <button id="cart-button" aria-label="View cart">🛒 Cart (0)</button>
+    </div>
+  </header>
+
+  <section class="products" aria-label="Product list">
+    <div class="product" id="product1" tabindex="0" role="group" aria-labelledby="prod1-name">
+      <img src="https://images.unsplash.com/photo-1580910051077-21f43e03eb0f?auto=format&fit=crop&w=150&q=80" alt="Blue Sneakers" />
+      <div class="product-details">
+        <h2 id="prod1-name">Blue Sneakers</h2>
+        <p>$59.99</p>
+        <button onclick="addToCart('Blue Sneakers', 59.99)">Add to Cart</button>
+      </div>
+    </div>
+    <div class="product" id="product2" tabindex="0" role="group" aria-labelledby="prod2-name">
+      <img src="https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&fit=crop&w=150&q=80" alt="Smart Watch" />
+      <div class="product-details">
+        <h2 id="prod2-name">Smart Watch</h2>
+        <p>$199.99</p>
+        <button onclick="addToCart('Smart Watch', 199.99)">Add to Cart</button>
+      </div>
+    </div>
+    <div class="product" id="product3" tabindex="0" role="group" aria-labelledby="prod3-name">
+      <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=150&q=80" alt="Wireless Headphones" />
+      <div class="product-details">
+        <h2 id="prod3-name">Wireless Headphones</h2>
+        <p>$129.99</p>
+        <button onclick="addToCart('Wireless Headphones', 129.99)">Add to Cart</button>
+      </div>
+    </div>
+    <div class="product" id="product4" tabindex="0" role="group" aria-labelledby="prod4-name">
+      <img src="https://images.unsplash.com/photo-1526170375885-4f8ecf77b999?auto=format&fit=crop&w=150&q=80" alt="Leather Wallet" />
+      <div class="product-details">
+        <h2 id="prod4-name">Leather Wallet</h2>
+        <p>$39.99</p>
+        <button onclick="addToCart('Leather Wallet', 39.99)">Add to Cart</button>
+      </div>
+    </div>
+  </section>
+
+  <div id="cart-modal" class="cart-modal" role="dialog" aria-modal="true" aria-labelledby="cart-title" tabindex="-1">
+    <div class="cart-content">
+      <h2 id="cart-title">Your Cart</h2>
+      <ul id="cart-items" aria-live="polite"></ul>
+      <p>Total: $<span id="total-price">0.00</span></p>
+      <button id="close-cart">Close</button>
+    </div>
+  </div>
+
+  <script>
+    let cart = [];
+    let total = 0;
+
+    function addToCart(productName, productPrice) {
+      cart.push({ name: productName, price: productPrice });
+      total += productPrice;
+
+      updateCartButton();
+      updateCartModal();
+    }
+
+    function updateCartButton() {
+      const cartBtn = document.getElementById('cart-button');
+      cartBtn.textContent = `🛒 Cart (${cart.length})`;
+    }
+
+    function updateCartModal() {
+      const cartItemsList = document.getElementById('cart-items');
+      const totalPrice = document.getElementById('total-price');
+
+      cartItemsList.innerHTML = '';
+
+      cart.forEach((item, index) => {
+        const li = document.createElement('li');
+        li.textContent = `${item.name} - $${item.price.toFixed(2)}`;
+
+        const removeBtn = document.createElement('button');
+        removeBtn.textContent = 'Remove';
+        removeBtn.setAttribute('aria-label', `Remove ${item.name} from cart`);
+        removeBtn.onclick = () => removeFromCart(index);
+
+        li.appendChild(removeBtn);
+        li.style.display = 'flex';
+        li.style.justifyContent = 'space-between';
+        li.style.alignItems = 'center';
+
+        cartItemsList.appendChild(li);
+      });
+
+      totalPrice.textContent = total.toFixed(2);
+    }
+
+    function removeFromCart(index) {
+      total -= cart[index].price;
+      cart.splice(index, 1);
+
+      updateCartButton();
+      updateCartModal();
+    }
+
+    const cartButton = document.getElementById('cart-button');
+    const cartModal = document.getElementById('cart-modal');
+    const closeCartBtn = document.getElementById('close-cart');
+
+    cartButton.addEventListener('click', () => {
+      cartModal.style.display = 'flex';
+      cartModal.focus();
+      document.body.style.overflow = 'hidden'; // prevent background scroll
+    });
+
+    closeCartBtn.addEventListener('click', () => {
+      cartModal.style.display = 'none';
+      document.body.style.overflow = 'auto';
+      cartButton.focus();
+    });
+
+    // Close modal on outside click
+    cartModal.addEventListener('click', (e) => {
+      if (e.target === cartModal) {
+        cartModal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+        cartButton.focus();
+      }
+    });
+
+    // Keyboard accessibility: close modal on ESC
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && cartModal.style.display === 'flex') {
+        cartModal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+        cartButton.focus();
+      }
+    });
+  </script>
+</body>
+</html>
